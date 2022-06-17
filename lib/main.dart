@@ -45,6 +45,51 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text(
+                "Account Information",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ListTile(
+              title: const Text("Email"),
+              leading: const Icon(Icons.email_rounded),
+              onTap: () {},
+            ),
+            ListTile(
+              title: const Text("Phone Number"),
+              leading: const Icon(Icons.phone),
+              onTap: () {},
+            ),
+            ListTile(
+              title: const Text("Name"),
+              leading: const Icon(Icons.person),
+              onTap: () {},
+            ),
+            ListTile(
+              title: const Text("Address"),
+              leading: const Icon(Icons.location_city),
+              onTap: () {},
+            ),
+            ListTile(
+              title: const Text("Home"),
+              leading: const Icon(Icons.home_filled),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
