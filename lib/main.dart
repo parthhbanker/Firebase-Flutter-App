@@ -29,22 +29,21 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int pageIndex = 0;
+  final pages = [
+    const Page1(),
+    const Page2(),
+    const Page3(),
+    const Page4(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[
-            Text(
-              'Hello Aliens!',
-            ),
-          ],
-        ),
-      ),
+      body: pages[pageIndex],
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -90,6 +89,132 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+      bottomNavigationBar: Container(
+        height: 80,
+        decoration: const BoxDecoration(
+            color: Colors.blue,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0))),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  pageIndex = 0;
+                });
+              },
+              icon: pageIndex == 0
+                  ? const Icon(
+                      Icons.home_filled,
+                      color: Colors.white,
+                    )
+                  : const Icon(
+                      Icons.home_outlined,
+                      color: Colors.white,
+                    ),
+            ),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  pageIndex = 1;
+                });
+              },
+              icon: pageIndex == 1
+                  ? const Icon(
+                      Icons.shop,
+                      color: Colors.white,
+                    )
+                  : const Icon(
+                      Icons.shop_outlined,
+                      color: Colors.white,
+                    ),
+            ),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  pageIndex = 2;
+                });
+              },
+              icon: pageIndex == 2
+                  ? const Icon(
+                      Icons.account_circle,
+                      color: Colors.white,
+                    )
+                  : const Icon(
+                      Icons.account_circle_outlined,
+                      color: Colors.white,
+                    ),
+            ),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  pageIndex = 3;
+                });
+              },
+              icon: pageIndex == 3
+                  ? const Icon(
+                      Icons.account_box_rounded,
+                      color: Colors.white,
+                    )
+                  : const Icon(
+                      Icons.account_box_outlined,
+                      color: Colors.white,
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Page1 extends StatelessWidget {
+  const Page1({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text("Page 1"),
+    );
+  }
+}
+
+class Page2 extends StatelessWidget {
+  const Page2({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text("Page 2"),
+    );
+  }
+}
+
+class Page3 extends StatelessWidget {
+  const Page3({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text("Page 3"),
+    );
+  }
+}
+
+class Page4 extends StatelessWidget {
+  const Page4({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text("Page 4"),
     );
   }
 }
