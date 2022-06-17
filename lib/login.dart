@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 200,
                 width: 200,
                 decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 14, 123, 213),
+                    color: Colors.red,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
+                    /*Container(
                       alignment: Alignment.topLeft,
                       margin: const EdgeInsets.only(left: 25),
                       child: const Text(
@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
-                    ),
+                    ),*/
                     const SizedBox(
                       height: 30,
                     ),
