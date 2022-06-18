@@ -2,8 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({Key? key}) : super(key: key);
-
   @override
   State<SignupPage> createState() => _SignupPageState();
 }
@@ -97,8 +95,9 @@ class _SignupPageState extends State<SignupPage> {
                           margin: const EdgeInsets.only(
                               top: 50, left: 25, right: 25),
                           child: TextFormField(
+                            controller: usernameController,
                             autofocus: true,
-                            keyboardType: TextInputType.emailAddress,
+                            keyboardType: TextInputType.text,
                             decoration:
                                 const InputDecoration(label: Text("Username")),
                           ),
@@ -110,6 +109,7 @@ class _SignupPageState extends State<SignupPage> {
                               top: 20, left: 25, right: 25),
                           child: TextFormField(
                             autofocus: true,
+                            controller: emailController,
                             keyboardType: TextInputType.emailAddress,
                             decoration:
                                 const InputDecoration(label: Text("Email")),
@@ -123,7 +123,8 @@ class _SignupPageState extends State<SignupPage> {
                           child: TextFormField(
                             obscureText: isPasswordHidden,
                             autofocus: true,
-                            keyboardType: TextInputType.emailAddress,
+                            controller: passwordController,
+                            keyboardType: TextInputType.visiblePassword,
                             decoration:
                                 const InputDecoration(label: Text("Password")),
                           ),
@@ -136,7 +137,8 @@ class _SignupPageState extends State<SignupPage> {
                           child: TextFormField(
                             obscureText: isPasswordHidden,
                             autofocus: true,
-                            keyboardType: TextInputType.emailAddress,
+                            controller: conPasswordController,
+                            keyboardType: TextInputType.visiblePassword,
                             decoration: const InputDecoration(
                                 label: Text("Confirm Password")),
                           ),

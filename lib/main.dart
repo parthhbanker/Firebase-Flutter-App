@@ -1,10 +1,14 @@
+import 'package:basic/decisiion_tree.dart';
 import 'package:basic/home.dart';
 import 'package:basic/login.dart';
 import 'package:basic/onboarding.dart';
 import 'package:basic/signup.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -19,12 +23,13 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      initialRoute: '/home',
+      initialRoute: '/',
       routes: {
-        '/': (context) => const OnBoarding(),
-        '/login': (context) => const LoginPage(),
-        '/signup': (context) => const SignupPage(),
-        '/home': (context) => const HomePage()
+        '/': (context) => DecisionTree(),
+        '/onboarding': (context) => OnBoarding(),
+        '/login': (context) => LoginPage(),
+        '/signup': (context) => SignupPage(),
+        '/home': (context) => HomePage()
       },
     );
   }

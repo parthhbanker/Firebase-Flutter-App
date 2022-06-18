@@ -1,9 +1,9 @@
 import 'dart:ui';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
-
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -12,8 +12,11 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   var isPasswordHidden = false;
 
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  // firebase
+  final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +75,7 @@ class _LoginPageState extends State<LoginPage> {
             SafeArea(
               child: SingleChildScrollView(
                 child: Form(
+                  autovalidateMode: AutovalidateMode.always,
                   key: _formKey,
                   child: Center(
                     child: Column(
@@ -96,9 +100,23 @@ class _LoginPageState extends State<LoginPage> {
                               top: 50, left: 25, right: 25),
                           child: TextFormField(
                             autofocus: true,
+                            controller: emailController,
                             keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return ("* required");
+                              }
+                              // reg expression for email validation
+                              if (!RegExp(
+                                      "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
+                                  .hasMatch(value)) {
+                                return ("Please enter a valid email!");
+                              }
+
+                              return null;
+                            },
                             decoration:
-                                const InputDecoration(label: Text("Username")),
+                                const InputDecoration(label: Text("Email")),
                           ),
                         ),
 
@@ -109,7 +127,17 @@ class _LoginPageState extends State<LoginPage> {
                           child: TextFormField(
                             obscureText: isPasswordHidden,
                             autofocus: true,
+                            controller: passwordController,
                             keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              RegExp regex = RegExp(r'^.{6,}$');
+                              if (value!.isEmpty) {
+                                return ("* required");
+                              }
+                              if (!regex.hasMatch(value)) {
+                                return ("Minimum 6 characters!");
+                              }
+                            },
                             decoration:
                                 const InputDecoration(label: Text("Password")),
                           ),
@@ -121,7 +149,10 @@ class _LoginPageState extends State<LoginPage> {
                           height: 40,
                           margin: const EdgeInsets.only(top: 50),
                           child: OutlinedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              signIn(emailController.text.toString(),
+                                  passwordController.text.toString());
+                            },
                             style: OutlinedButton.styleFrom(
                                 backgroundColor:
                                     const Color.fromARGB(255, 27, 119, 194),
@@ -174,5 +205,23 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  void signIn(String email, String password) async {
+    if (_formKey.currentState!.validate()) {
+      print("hello");
+      print(email);
+      print(password);
+      await _auth
+          .signInWithEmailAndPassword(
+              email: email.toString(), password: password.toString())
+          .then((uid) => {
+                Fluttertoast.showToast(msg: "Login Successful!"),
+                Navigator.pushReplacementNamed(context, '/home')
+              })
+          .catchError((e) {
+        Fluttertoast.showToast(msg: e!.message);
+      });
+    }
   }
 }
