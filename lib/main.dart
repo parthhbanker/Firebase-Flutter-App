@@ -1,14 +1,10 @@
 import 'package:basic/home.dart';
 import 'package:basic/login.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:basic/onboarding.dart';
+import 'package:basic/signup.dart';
 import 'package:flutter/material.dart';
-import 'package:overlay_support/overlay_support.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-
+void main() {
   runApp(const MyApp());
 }
 
@@ -17,15 +13,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OverlaySupport(
-      child: MaterialApp(
-        title: 'Flutter Practice',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: LoginPage(),
-        debugShowCheckedModeBanner: false,
+    return MaterialApp(
+      title: 'Flutter Practice',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
       ),
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/home',
+      routes: {
+        '/': (context) => const OnBoarding(),
+        '/login': (context) => const LoginPage(),
+        '/signup': (context) => const SignupPage(),
+        '/home': (context) => const HomePage()
+      },
     );
   }
 }

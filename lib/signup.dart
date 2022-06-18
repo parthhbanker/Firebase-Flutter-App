@@ -1,19 +1,21 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class SignupPage extends StatefulWidget {
+  const SignupPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
   var isPasswordHidden = false;
 
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  final conPasswordController = TextEditingController();
+  final emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
                             top: 80,
                           ),
                           child: const Text(
-                            "Welcome Back!",
+                            "Create an Account",
                             style: TextStyle(
                                 fontSize: 28, fontWeight: FontWeight.bold),
                           ),
@@ -102,6 +104,18 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
 
+                        // Email Input
+                        Container(
+                          margin: const EdgeInsets.only(
+                              top: 20, left: 25, right: 25),
+                          child: TextFormField(
+                            autofocus: true,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration:
+                                const InputDecoration(label: Text("Email")),
+                          ),
+                        ),
+
                         // Password Input
                         Container(
                           margin: const EdgeInsets.only(
@@ -115,7 +129,20 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
 
-                        // Login Now Button
+                        // Confirm Password Input
+                        Container(
+                          margin: const EdgeInsets.only(
+                              top: 20, left: 25, right: 25),
+                          child: TextFormField(
+                            obscureText: isPasswordHidden,
+                            autofocus: true,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: const InputDecoration(
+                                label: Text("Confirm Password")),
+                          ),
+                        ),
+
+                        // Sign up Button
                         Container(
                           width: 200,
                           height: 40,
@@ -132,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
                                             Color.fromARGB(255, 27, 119, 194),
                                         width: 2.0))),
                             child: const Text(
-                              "Login Now",
+                              "Sign up",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w800,
@@ -141,26 +168,18 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
 
-                        // Forgot Password
                         Container(
-                          margin: const EdgeInsets.all(5),
-                          child: TextButton(
-                              onPressed: () {},
-                              child: const Text("Forgot Password?")),
-                        ),
-
-                        Container(
-                          margin: const EdgeInsets.only(top: 250),
+                          margin: const EdgeInsets.only(top: 160),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text("Dont have an account?"),
+                              const Text("Already have an account?"),
                               TextButton(
                                   onPressed: () {
                                     Navigator.pushReplacementNamed(
-                                        context, '/signup');
+                                        context, '/login');
                                   },
-                                  child: const Text("Sign Up"))
+                                  child: const Text("Login"))
                             ],
                           ),
                         ),
