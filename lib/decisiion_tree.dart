@@ -1,3 +1,4 @@
+import 'package:basic/home.dart';
 import 'package:basic/onboarding.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,7 +10,10 @@ class DecisionTree extends StatefulWidget {
 
 class _DecisionTreeState extends State<DecisionTree> {
   @override
-  Widget build(BuildContext context) {
+  StatefulWidget build(BuildContext context) {
+    if (FirebaseAuth.instance.currentUser != null) {
+      return HomePage();
+    }
     return OnBoarding();
   }
 }
