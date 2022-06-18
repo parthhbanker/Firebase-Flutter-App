@@ -137,6 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                               if (!regex.hasMatch(value)) {
                                 return ("Minimum 6 characters!");
                               }
+                              return null;
                             },
                             decoration:
                                 const InputDecoration(label: Text("Password")),

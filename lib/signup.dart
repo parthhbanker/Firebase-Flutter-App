@@ -1,5 +1,9 @@
 import 'dart:ui';
+import 'package:basic/model/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -7,6 +11,8 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
+  final _auth = FirebaseAuth.instance;
+
   final _formKey = GlobalKey<FormState>();
   var isPasswordHidden = false;
 
@@ -14,6 +20,8 @@ class _SignupPageState extends State<SignupPage> {
   final passwordController = TextEditingController();
   final conPasswordController = TextEditingController();
   final emailController = TextEditingController();
+
+  String? pass;
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +81,7 @@ class _SignupPageState extends State<SignupPage> {
               child: SingleChildScrollView(
                 child: Form(
                   key: _formKey,
+                  autovalidateMode: AutovalidateMode.always,
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -96,6 +105,17 @@ class _SignupPageState extends State<SignupPage> {
                               top: 50, left: 25, right: 25),
                           child: TextFormField(
                             controller: usernameController,
+                            validator: (value) {
+                              RegExp regex = RegExp(r'^.{3,}$');
+
+                              if (value!.isEmpty) {
+                                return '* Required';
+                              }
+                              if (!regex.hasMatch(value)) {
+                                return "Minimum 3 character";
+                              }
+                              return null;
+                            },
                             autofocus: true,
                             keyboardType: TextInputType.text,
                             decoration:
@@ -111,6 +131,19 @@ class _SignupPageState extends State<SignupPage> {
                             autofocus: true,
                             controller: emailController,
                             keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return ("* required");
+                              }
+                              // reg expression for email validation
+                              if (!RegExp(
+                                      "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
+                                  .hasMatch(value)) {
+                                return ("Please enter a valid email!");
+                              }
+
+                              return null;
+                            },
                             decoration:
                                 const InputDecoration(label: Text("Email")),
                           ),
@@ -125,6 +158,16 @@ class _SignupPageState extends State<SignupPage> {
                             autofocus: true,
                             controller: passwordController,
                             keyboardType: TextInputType.visiblePassword,
+                            validator: (value) {
+                              RegExp regex = RegExp(r'^.{6,}$');
+                              pass = value;
+                              if (value!.isEmpty) {
+                                return ("* required");
+                              }
+                              if (!regex.hasMatch(value)) {
+                                return ("Minimum 6 characters!");
+                              }
+                            },
                             decoration:
                                 const InputDecoration(label: Text("Password")),
                           ),
@@ -139,6 +182,14 @@ class _SignupPageState extends State<SignupPage> {
                             autofocus: true,
                             controller: conPasswordController,
                             keyboardType: TextInputType.visiblePassword,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return '* Required';
+                              }
+                              if (value != pass) {
+                                return "Both password are not matching!";
+                              }
+                            },
                             decoration: const InputDecoration(
                                 label: Text("Confirm Password")),
                           ),
@@ -150,7 +201,10 @@ class _SignupPageState extends State<SignupPage> {
                           height: 40,
                           margin: const EdgeInsets.only(top: 50),
                           child: OutlinedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              signUp(emailController.text.toString(),
+                                  passwordController.text.toString());
+                            },
                             style: OutlinedButton.styleFrom(
                                 backgroundColor:
                                     const Color.fromARGB(255, 27, 119, 194),
@@ -195,5 +249,40 @@ class _SignupPageState extends State<SignupPage> {
         ),
       ),
     );
+  }
+
+  void signUp(String email, String password) async {
+    if (_formKey.currentState!.validate()) {
+      await _auth
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .then((value) => {postDetailsToFirestore()})
+          .catchError((e) {
+        Fluttertoast.showToast(msg: e!.message);
+      });
+    }
+  }
+
+  postDetailsToFirestore() async {
+    // Calling our firestore
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    User? user = _auth.currentUser;
+
+    // Calling usermodel
+    UserModel userModel = UserModel();
+
+    // writing all the values
+    userModel.email = user!.email;
+    userModel.uid = user.uid;
+    userModel.username = usernameController.text;
+
+    // sending our values
+    await firebaseFirestore
+        .collection("users")
+        .doc(user.uid)
+        .set(userModel.toMap());
+
+    Fluttertoast.showToast(msg: "Account Created Successfully ;)");
+
+    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }
 }

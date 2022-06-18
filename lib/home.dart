@@ -1,5 +1,8 @@
 import 'dart:ui';
 
+import 'package:basic/model/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,6 +18,21 @@ class _HomePageState extends State<HomePage> {
     const Page3(),
     const Page4(),
   ];
+  User? user = FirebaseAuth.instance.currentUser;
+  UserModel loggedInUser = UserModel();
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(user!.uid)
+        .get()
+        .then((value) {
+      loggedInUser = UserModel.fromMap(value.data());
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +81,13 @@ class _HomePageState extends State<HomePage> {
               leading: const Icon(Icons.home_filled),
               onTap: () {
                 Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text("Log Out"),
+              leading: const Icon(Icons.home_filled),
+              onTap: () {
+                logout(context);
               },
             ),
           ],
@@ -146,6 +171,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Future<void> logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacementNamed(context, '/');
   }
 }
 
