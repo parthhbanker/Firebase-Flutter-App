@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -210,9 +212,6 @@ class _LoginPageState extends State<LoginPage> {
 
   void signIn(String email, String password) async {
     if (_formKey.currentState!.validate()) {
-      print("hello");
-      print(email);
-      print(password);
       await _auth
           .signInWithEmailAndPassword(
               email: email.toString(), password: password.toString())

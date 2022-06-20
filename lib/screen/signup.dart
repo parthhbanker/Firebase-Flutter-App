@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:ui';
 import 'package:basic/model/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class SignupPage extends StatefulWidget {
+  const SignupPage({Key? key}) : super(key: key);
+
   @override
   State<SignupPage> createState() => _SignupPageState();
 }
@@ -167,6 +171,7 @@ class _SignupPageState extends State<SignupPage> {
                               if (!regex.hasMatch(value)) {
                                 return ("Minimum 6 characters!");
                               }
+                              return null;
                             },
                             decoration:
                                 const InputDecoration(label: Text("Password")),
@@ -189,6 +194,7 @@ class _SignupPageState extends State<SignupPage> {
                               if (value != pass) {
                                 return "Both password are not matching!";
                               }
+                              return null;
                             },
                             decoration: const InputDecoration(
                                 label: Text("Confirm Password")),
@@ -283,6 +289,6 @@ class _SignupPageState extends State<SignupPage> {
 
     Fluttertoast.showToast(msg: "Account Created Successfully ;)");
 
-    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => true);
   }
 }
