@@ -1,7 +1,5 @@
 import 'package:basic/view/second.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 import '../model/post.dart';
 import '../sevice/getdata.dart';
@@ -28,6 +26,9 @@ class _PostViewState extends State<PostView> {
     return Scaffold(
       body: Visibility(
         visible: isLoad,
+        replacement: const Center(
+          child: CircularProgressIndicator.adaptive(),
+        ),
         child: ListView.builder(
           itemBuilder: (context, index) {
             return Container(

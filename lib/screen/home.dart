@@ -1,10 +1,11 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:basic/model/user_model.dart';
 import 'package:basic/view/postView.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
+import '../model/album.dart';
+import '../sevice/sendAlbum.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,6 +19,7 @@ class _HomePageState extends State<HomePage> {
   final pages = [
     const PostView(),
     const Page2(),
+    // const Page3(),
     const Page3(),
     const Page4(),
   ];
@@ -171,26 +173,123 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class Page2 extends StatelessWidget {
+class Page2 extends StatefulWidget {
   const Page2({Key? key}) : super(key: key);
 
   @override
+  State<Page2> createState() => _Page2State();
+}
+
+class _Page2State extends State<Page2> {
+  final TextEditingController _controller = TextEditingController();
+  Future<Album>? _futureAlbum;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      child: const Text("Page 2"),
+    return Scaffold(
+      body: Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(8.0),
+        child: (_futureAlbum == null) ? buildColumn() : buildFutureBuilder(),
+      ),
+    );
+  }
+
+  Column buildColumn() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        TextField(
+          controller: _controller,
+          decoration: const InputDecoration(hintText: 'Enter Title'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              _futureAlbum =
+                  SendAlbum().createAlbum(_controller.text.toString());
+            });
+          },
+          child: const Text('Create Data'),
+        ),
+      ],
+    );
+  }
+
+  FutureBuilder<Album> buildFutureBuilder() {
+    return FutureBuilder<Album>(
+      future: _futureAlbum,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Text(snapshot.data!.title);
+        } else if (snapshot.hasError) {
+          return Text('${snapshot.error}');
+        }
+
+        return const CircularProgressIndicator();
+      },
     );
   }
 }
 
-class Page3 extends StatelessWidget {
+class Page3 extends StatefulWidget {
   const Page3({Key? key}) : super(key: key);
 
   @override
+  State<Page3> createState() => _Page3State();
+}
+
+class _Page3State extends State<Page3> {
+  final TextEditingController _controller = TextEditingController();
+  late Future<Album> _futureAlbum;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureAlbum = SendAlbum().fetchAlbum();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      child: const Text("Page 3"),
+    return Scaffold(
+      body: Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(8.0),
+        child: FutureBuilder<Album>(
+          future: _futureAlbum,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasData) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(snapshot.data!.title),
+                    TextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter Title',
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _futureAlbum =
+                              SendAlbum().updateAlbum(_controller.text);
+                        });
+                      },
+                      child: const Text('Update Data'),
+                    ),
+                  ],
+                );
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+            }
+
+            return const CircularProgressIndicator();
+          },
+        ),
+      ),
     );
   }
 }
@@ -238,7 +337,7 @@ class _Page4State extends State<Page4> {
           ),
           const Divider(),
           Container(
-            margin: EdgeInsets.only(top: 10, bottom: 5),
+            margin: const EdgeInsets.only(top: 10, bottom: 5),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -253,7 +352,7 @@ class _Page4State extends State<Page4> {
           ),
           const Divider(),
           Container(
-            margin: EdgeInsets.only(top: 10, bottom: 5),
+            margin: const EdgeInsets.only(top: 10, bottom: 5),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -268,7 +367,7 @@ class _Page4State extends State<Page4> {
           ),
           const Divider(),
           Container(
-            margin: EdgeInsets.only(top: 10, bottom: 5),
+            margin: const EdgeInsets.only(top: 10, bottom: 5),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -283,7 +382,7 @@ class _Page4State extends State<Page4> {
           ),
           const Divider(),
           Container(
-            margin: EdgeInsets.only(top: 10, bottom: 5),
+            margin: const EdgeInsets.only(top: 10, bottom: 5),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -309,7 +408,7 @@ class _Page4State extends State<Page4> {
                   onPressed: () {
                     resetPass();
                   },
-                  child: Text("Reset Password")),
+                  child: const Text("Reset Password")),
             ],
           ),
         ],
