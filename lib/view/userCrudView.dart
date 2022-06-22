@@ -1,7 +1,9 @@
 // ignore_for_file: avoid_unnecessary_containers, sized_box_for_whitespace, avoid_print
 
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,9 +20,16 @@ class _UserCrudViewState extends State<UserCrudView> {
   var emailController = TextEditingController();
   var nameController = TextEditingController();
 
+  final Connectivity _connectivity = Connectivity();
+  var isConnected = false;
+  late StreamSubscription _subscription;
+
+  var isAdd = false, isEdit = false;
+
   @override
   void initState() {
     super.initState();
+    checkConnectivity();
     fetchData();
     setState(() {});
   }
@@ -28,86 +37,182 @@ class _UserCrudViewState extends State<UserCrudView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Container(
-            child: Column(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          isAdd = true;
+          formDialog();
+          setState(() {});
+        },
+        child: const Icon(Icons.add),
+      ),
+      body: Visibility(
+        visible: isConnected && data.isNotEmpty,
+        replacement: Center(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    hintText: 'Name',
-                  ),
-                ),
-                TextField(
-                  controller: emailController,
-                  decoration: const InputDecoration(
-                    hintText: 'Email',
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            createData(
-                                nameController.text, emailController.text);
-                          });
-                        },
-                        child: const Text('Submit')),
-                    ElevatedButton(
-                        onPressed: () {
-                          editData(id);
-                          setState(() {});
-                        },
-                        child: const Text('Update')),
-                  ],
-                ),
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: data.length,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          child: ListTile(
-                            title: Text(data[index]['name']),
-                            subtitle: Text(data[index]['email']),
-                            trailing: Container(
-                              width: 100,
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          emailController.text =
-                                              data[index]['email'];
-                                          nameController.text =
-                                              data[index]['name'];
-                                          id = data[index]['id'].toString();
-                                        });
-                                      },
-                                      icon: const Icon(Icons.edit)),
-                                  IconButton(
-                                      onPressed: () {
-                                        deleteData(data[index]['id']);
-                                        setState(() {});
-                                      },
-                                      icon: const Icon(Icons.delete))
-                                ],
-                              ),
+                const CircularProgressIndicator.adaptive(),
+                const SizedBox(height: 20),
+                isConnected
+                    ? const Text('Loading...')
+                    : const Text('No Internet Connection'),
+              ]),
+        ),
+        child: mainScreen(),
+      ),
+    );
+  }
+
+  SafeArea mainScreen() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Container(
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        child: ListTile(
+                          title: Text(data[index]['name']),
+                          subtitle: Text(data[index]['email']),
+                          trailing: Container(
+                            width: 100,
+                            child: Row(
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        isEdit = true;
+                                        formDialog();
+                                        emailController.text =
+                                            data[index]['email'];
+                                        nameController.text =
+                                            data[index]['name'];
+                                        id = data[index]['id'].toString();
+                                      });
+                                    },
+                                    icon: const Icon(Icons.edit)),
+                                IconButton(
+                                    onPressed: () {
+                                      // deleteData(data[index]['id']);
+                                      deleteDialog(data[index]['id']);
+                                      setState(() {});
+                                    },
+                                    icon: const Icon(Icons.delete))
+                              ],
                             ),
                           ),
-                        );
-                      }),
-                )
-              ],
-            ),
+                        ),
+                      );
+                    }),
+              )
+            ],
           ),
         ),
       ),
     );
   }
+
+  Future deleteDialog(id) => showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: const Center(child: Text('Are you sure?')),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    child: const Text('Yes'),
+                    onPressed: () {
+                      deleteData(id);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ElevatedButton(
+                    child: const Text('No'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ));
+
+  Future formDialog() => showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: isAdd ? const Text('Add') : const Text('Edit'),
+            content: SizedBox(
+              height: 200,
+              child: Column(
+                children: [
+                  Visibility(
+                      visible: isAdd || isEdit,
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: nameController,
+                            decoration: const InputDecoration(
+                              hintText: 'Name',
+                            ),
+                          ),
+                          TextField(
+                            controller: emailController,
+                            decoration: const InputDecoration(
+                              hintText: 'Email',
+                            ),
+                          ),
+                        ],
+                      )),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Visibility(
+                        visible: isAdd,
+                        child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                createData(
+                                    nameController.text, emailController.text);
+                                Navigator.pop(context);
+                                isAdd = false;
+                              });
+                            },
+                            child: const Text('Submit')),
+                      ),
+                      Visibility(
+                        visible: isEdit,
+                        child: ElevatedButton(
+                            onPressed: () {
+                              editData(id);
+                              Navigator.pop(context);
+                              isEdit = false;
+                              setState(() {});
+                            },
+                            child: const Text('Update')),
+                      ),
+                      const SizedBox(width: 20),
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            isEdit = false;
+                            isAdd = false;
+                            setState(() {});
+                          },
+                          child: const Text('Close')),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ));
 
   void fetchData() async {
     final response =
@@ -167,5 +272,28 @@ class _UserCrudViewState extends State<UserCrudView> {
     } else {
       throw Exception("Unable to add data!");
     }
+  }
+
+  void checkConnectivity() {
+    _subscription = _connectivity.onConnectivityChanged.listen((event) {
+      if (event == ConnectivityResult.mobile ||
+          event == ConnectivityResult.wifi) {
+        setState(() {
+          isConnected = true;
+        });
+      } else {
+        setState(() {
+          isConnected = false;
+        });
+      }
+    });
+
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 }
