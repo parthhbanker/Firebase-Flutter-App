@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:basic/model/user_model.dart';
 import 'package:basic/screen/profile.dart';
+import 'package:basic/screen/sc2.dart';
 import 'package:basic/view/userCrudView.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,8 +19,8 @@ class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
   final pages = [
     const UserCrudView(),
-    const Profile(),
-    const Profile(),
+    const Screen2(),
+    const Screen2(),
     const Profile(),
   ];
   User? user = FirebaseAuth.instance.currentUser;

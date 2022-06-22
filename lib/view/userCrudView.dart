@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_unnecessary_containers, sized_box_for_whitespace, avoid_print
+// ignore_for_file: avoid_unnecessary_containers, sized_box_for_whitespace, avoid_print, file_names
 
 import 'dart:async';
 import 'dart:convert';
@@ -21,7 +21,8 @@ class _UserCrudViewState extends State<UserCrudView> {
   var nameController = TextEditingController();
 
   final Connectivity _connectivity = Connectivity();
-  var isConnected = false;
+  var isConnected = false, isError = false;
+  var errorMessage = "";
   late StreamSubscription _subscription;
 
   var isAdd = false, isEdit = false;
@@ -48,18 +49,17 @@ class _UserCrudViewState extends State<UserCrudView> {
       body: Visibility(
         visible: isConnected && data.isNotEmpty,
         replacement: Center(
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator.adaptive(),
-                const SizedBox(height: 20),
-                isConnected
-                    ? const Text('Loading...')
-                    : const Text('No Internet Connection'),
-              ]),
-        ),
-        child: mainScreen(),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+              const CircularProgressIndicator.adaptive(),
+              const SizedBox(height: 20),
+              isConnected
+                  ? const Text('Loading...')
+                  : const Text('No Internet Connection'),
+            ])),
+        child: isError ? Center(child: Text(errorMessage)) : mainScreen(),
       ),
     );
   }
@@ -221,8 +221,14 @@ class _UserCrudViewState extends State<UserCrudView> {
     if (response.statusCode == 200) {
       data = jsonDecode(response.body);
       print(data);
+    } else if (response.statusCode == 404) {
+      isError = true;
+      errorMessage = "Page not found";
+      setState(() {});
     } else {
-      throw Exception("Unable to load data");
+      isError = true;
+      errorMessage = "Unable to load data";
+      setState(() {});
     }
   }
 

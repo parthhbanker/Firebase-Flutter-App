@@ -4,8 +4,15 @@ class UserModel {
   String? username;
   String? phone;
   String? address;
+  String? dpURL;
 
-  UserModel({this.uid, this.email, this.username, this.phone, this.address});
+  UserModel(
+      {this.uid,
+      this.email,
+      this.username,
+      this.phone,
+      this.address,
+      this.dpURL});
 
   // receive data from server
   factory UserModel.fromMap(map) {
@@ -14,7 +21,8 @@ class UserModel {
         email: map['email'],
         username: map['username'],
         phone: map['phone'],
-        address: map['address']);
+        address: map['address'],
+        dpURL: map['dpURL']);
   }
 
   // sending data to our server
