@@ -1,8 +1,9 @@
 import 'package:basic/decisiion_tree.dart';
-import 'package:basic/home.dart';
-import 'package:basic/login.dart';
-import 'package:basic/onboarding.dart';
-import 'package:basic/signup.dart';
+import 'package:basic/screen/forgot.dart';
+import 'package:basic/screen/home.dart';
+import 'package:basic/screen/login.dart';
+import 'package:basic/screen/onboarding.dart';
+import 'package:basic/screen/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -25,11 +26,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => DecisionTree(),
-        '/onboarding': (context) => OnBoarding(),
-        '/login': (context) => LoginPage(),
-        '/signup': (context) => SignupPage(),
-        '/home': (context) => HomePage()
+        '/': (context) => const DecisionTree(),
+        '/onboarding': (context) => const OnBoarding(),
+        '/login': (context) => const LoginPage(),
+        '/signup': (context) => const SignupPage(),
+        '/home': (context) => const HomePage(),
+        '/forgot': ((context) => const ForgotPassword())
       },
     );
   }
