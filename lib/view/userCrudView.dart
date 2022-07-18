@@ -2,10 +2,12 @@
 
 import 'dart:async';
 import 'dart:convert';
-
+import 'dart:math' as math;
+import 'dart:ui';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 class UserCrudView extends StatefulWidget {
   const UserCrudView({Key? key}) : super(key: key);
@@ -34,6 +36,7 @@ class _UserCrudViewState extends State<UserCrudView> {
     fetchData();
     setState(() {});
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -75,35 +78,74 @@ class _UserCrudViewState extends State<UserCrudView> {
                 child: ListView.builder(
                     itemCount: data.length,
                     itemBuilder: (context, index) {
-                      return Container(
-                        child: ListTile(
-                          title: Text(data[index]['name']),
-                          subtitle: Text(data[index]['email']),
-                          trailing: Container(
-                            width: 100,
-                            child: Row(
-                              children: [
-                                IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        isEdit = true;
-                                        formDialog();
-                                        emailController.text =
-                                            data[index]['email'];
-                                        nameController.text =
-                                            data[index]['name'];
-                                        id = data[index]['id'].toString();
-                                      });
-                                    },
-                                    icon: const Icon(Icons.edit)),
-                                IconButton(
-                                    onPressed: () {
-                                      // deleteData(data[index]['id']);
-                                      deleteDialog(data[index]['id']);
-                                      setState(() {});
-                                    },
-                                    icon: const Icon(Icons.delete))
-                              ],
+                      return Dismissible(
+                        key: data.isNotEmpty
+                            ? Key(data[index]['id'].toString())
+                            : const Key('0'),
+                        confirmDismiss: (DismissDirection direction) async {
+                          if (DismissDirection.endToStart == direction) {
+                            return await deleteDialog(data[index]['id']);
+                          } else if (DismissDirection.startToEnd == direction) {
+                            setState(() {
+                              isEdit = true;
+                              formDialog();
+                              emailController.text = data[index]['email'];
+                              nameController.text = data[index]['name'];
+                              id = data[index]['id'].toString();
+                            });
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.only(top: 10, bottom: 10),
+                          margin: const EdgeInsets.only(
+                            bottom: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            image: DecorationImage(
+                                image: NetworkImage(
+                                    "https://picsum.photos/200/300?blur?random=${data[index]['id']}"),
+                                fit: BoxFit.cover,
+                                colorFilter: ColorFilter.mode(
+                                    Colors.black.withOpacity(0.2),
+                                    BlendMode.colorBurn),
+                                filterQuality: FilterQuality.high),
+                          ),
+                          child: Container(
+                            child: ListTile(
+                              style: ListTileStyle.drawer,
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.black.withOpacity(0.5),
+                                radius: 30,
+                                child: CircleAvatar(
+                                  backgroundColor: Color(
+                                          (math.Random().nextDouble() *
+                                                  0x818FDE)
+                                              .toInt())
+                                      .withOpacity(1.0),
+                                  radius: 25,
+                                  child: Text(
+                                    data[index]['name'][0],
+                                    style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                              title: Text(
+                                data[index]['name'],
+                                style: TextStyle(
+                                    fontSize: Adaptive.sp(17),
+                                    color: Colors.white),
+                                textAlign: TextAlign.center,
+                              ),
+                              subtitle: Text(
+                                data[index]['email'],
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.white),
+                              ),
                             ),
                           ),
                         ),

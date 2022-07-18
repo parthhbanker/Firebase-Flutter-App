@@ -44,6 +44,11 @@ dependencies:
   connectivity_plus: ^2.3.5
   firebase_storage: ^10.2.18
   image_picker: ^0.8.5+3
+  flutter_local_notifications : ^9.6.1
+  responsive_sizer: ^3.0.8
+  webview_flutter: ^3.0.4
+  glassmorphism_widgets: ^0.1.1
+  glassmorphism_ui: ^0.3.0
 
 dev_dependencies:
   flutter_test:

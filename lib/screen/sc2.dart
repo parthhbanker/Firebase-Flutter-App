@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Screen2 extends StatefulWidget {
   const Screen2({Key? key}) : super(key: key);
@@ -35,7 +34,6 @@ class _Screen2State extends State<Screen2> {
     Reference ref = FirebaseStorage.instance.ref().child('images');
     await ref.putFile(_image!);
     downloadURL = await ref.getDownloadURL();
-    print(downloadURL!);
   }
 
   void showError(String text, Duration d) {
@@ -79,13 +77,13 @@ class _Screen2State extends State<Screen2> {
                   onPressed: () {
                     pickImage();
                   },
-                  child: Text("Select Image")),
+                  child: const Text("Select Image")),
               const SizedBox(height: 10),
               ElevatedButton(
                   onPressed: () {
                     uploadImage();
                   },
-                  child: Text("Upload")),
+                  child: const Text("Upload")),
             ]),
           ),
         ),

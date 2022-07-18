@@ -12,7 +12,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  var isPasswordHidden = false;
+  var isPasswordHidden = true;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -127,23 +127,31 @@ class _LoginPageState extends State<LoginPage> {
                           margin: const EdgeInsets.only(
                               top: 20, left: 25, right: 25),
                           child: TextFormField(
-                            obscureText: isPasswordHidden,
-                            autofocus: true,
-                            controller: passwordController,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              RegExp regex = RegExp(r'^.{6,}$');
-                              if (value!.isEmpty) {
-                                return ("* required");
-                              }
-                              if (!regex.hasMatch(value)) {
-                                return ("Minimum 6 characters!");
-                              }
-                              return null;
-                            },
-                            decoration:
-                                const InputDecoration(label: Text("Password")),
-                          ),
+                              obscureText: isPasswordHidden,
+                              autofocus: true,
+                              controller: passwordController,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                RegExp regex = RegExp(r'^.{6,}$');
+                                if (value!.isEmpty) {
+                                  return ("* required");
+                                }
+                                if (!regex.hasMatch(value)) {
+                                  return ("Minimum 6 characters!");
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                  label: const Text("Password"),
+                                  suffixIcon: IconButton(
+                                      onPressed: () {
+                                        isPasswordHidden = !isPasswordHidden;
+                                        setState(() {});
+                                      },
+                                      icon: const Icon(Icons.remove_red_eye),
+                                      ),
+                                      ),
+                                      ),
                         ),
 
                         // Login Now Button

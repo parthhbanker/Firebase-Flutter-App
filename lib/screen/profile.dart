@@ -68,70 +68,75 @@ class _Page4State extends State<Profile> {
         },
         child: isEditing ? const Icon(Icons.save) : const Icon(Icons.edit),
       ),
-      body: Form(
-        key: _formKey,
-        child: Container(
-          margin: const EdgeInsets.only(top: 20, left: 30, right: 30),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: IconButton(
-                    icon: _image == null
-                        ? CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(loggedInUser.dpURL.toString()),
-                            radius: 200,
-                          )
-                        : CircleAvatar(
-                            backgroundImage: FileImage(_image!),
-                            radius: 200,
-                          ),
-                    iconSize: 120,
-                    onPressed: !isEditing
-                        ? null
-                        : () {
-                            pickImage();
-                          }),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              TextFormField(
-                controller: usernameController,
-                decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.account_circle_rounded)),
-                enabled: isEditing,
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              TextFormField(
-                controller: emailController,
-                decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.email_rounded)),
-                enabled: false,
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              TextFormField(
-                controller: addressController,
-                decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.house_rounded)),
-                enabled: isEditing,
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              TextFormField(
-                controller: phoneController,
-                decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.phone_rounded)),
-                enabled: isEditing,
-              ),
-            ],
+      body: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Container(
+            margin: const EdgeInsets.only(top: 20, left: 30, right: 30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: IconButton(
+                      icon: _image == null
+                          ? ((loggedInUser.dpURL.toString() == "null") ||
+                                  loggedInUser.dpURL.toString() == "")
+                              ? const Image(image: AssetImage('assets/3.png'))
+                              : CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      loggedInUser.dpURL.toString()),
+                                  radius: 200,
+                                )
+                          : CircleAvatar(
+                              backgroundImage: FileImage(_image!),
+                              radius: 200,
+                            ),
+                      iconSize: 120,
+                      onPressed: !isEditing
+                          ? null
+                          : () {
+                              pickImage();
+                            }),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                TextFormField(
+                  controller: usernameController,
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.account_circle_rounded)),
+                  enabled: isEditing,
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.email_rounded)),
+                  enabled: false,
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                TextFormField(
+                  controller: addressController,
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.house_rounded)),
+                  enabled: isEditing,
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                TextFormField(
+                  controller: phoneController,
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.phone_rounded)),
+                  enabled: isEditing,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -147,23 +152,23 @@ class _Page4State extends State<Profile> {
     if (!isEditing) {
       if (_image != null) {
         uploadImage();
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(user!.uid)
+            .update({
+              'username': usernameController.text,
+              'email': emailController.text,
+              'address': addressController.text,
+              'phone': phoneController.text,
+              'dpURL': downloadURL
+            })
+            .then((value) => getUserInfo())
+            .then((value) => Fluttertoast.showToast(
+                  msg: "Information Upadted Successfully",
+                ))
+            .catchError(
+                (error) => Fluttertoast.showToast(msg: error.toString()));
       }
-
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .update({
-            'username': usernameController.text,
-            'email': emailController.text,
-            'address': addressController.text,
-            'phone': phoneController.text,
-            'dpURL': downloadURL
-          })
-          .then((value) => getUserInfo())
-          .then((value) => Fluttertoast.showToast(
-                msg: "Information Upadted Successfully",
-              ))
-          .catchError((error) => Fluttertoast.showToast(msg: error.toString()));
     }
   }
 
@@ -184,7 +189,7 @@ class _Page4State extends State<Profile> {
         FirebaseStorage.instance.ref().child(loggedInUser.uid.toString());
     await ref.putFile(_image!);
     downloadURL = await ref.getDownloadURL();
-    print(downloadURL!);
+    print(downloadURL);
     _image = null;
   }
 

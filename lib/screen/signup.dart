@@ -18,7 +18,8 @@ class _SignupPageState extends State<SignupPage> {
   final _auth = FirebaseAuth.instance;
 
   final _formKey = GlobalKey<FormState>();
-  var isPasswordHidden = false;
+  var isPasswordHidden = true;
+  var isConPasswordHidden = true;
 
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -173,8 +174,16 @@ class _SignupPageState extends State<SignupPage> {
                               }
                               return null;
                             },
-                            decoration:
-                                const InputDecoration(label: Text("Password")),
+                            decoration: InputDecoration(
+                              label: Text("Password"),
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  isPasswordHidden = !isPasswordHidden;
+                                  setState(() {});
+                                },
+                                icon: const Icon(Icons.remove_red_eye),
+                              ),
+                            ),
                           ),
                         ),
 
@@ -183,7 +192,7 @@ class _SignupPageState extends State<SignupPage> {
                           margin: const EdgeInsets.only(
                               top: 20, left: 25, right: 25),
                           child: TextFormField(
-                            obscureText: isPasswordHidden,
+                            obscureText: isConPasswordHidden,
                             autofocus: true,
                             controller: conPasswordController,
                             keyboardType: TextInputType.visiblePassword,
@@ -196,8 +205,16 @@ class _SignupPageState extends State<SignupPage> {
                               }
                               return null;
                             },
-                            decoration: const InputDecoration(
-                                label: Text("Confirm Password")),
+                            decoration: InputDecoration(
+                              label: Text("Confirm Password"),
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  isConPasswordHidden = !isConPasswordHidden;
+                                  setState(() {});
+                                },
+                                icon: const Icon(Icons.remove_red_eye),
+                              ),
+                            ),
                           ),
                         ),
 

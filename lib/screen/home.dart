@@ -2,11 +2,14 @@
 import 'package:basic/model/user_model.dart';
 import 'package:basic/screen/profile.dart';
 import 'package:basic/screen/sc2.dart';
+import 'package:basic/screen/web.dart';
 import 'package:basic/view/userCrudView.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:glassmorphism_widgets/glassmorphism_widgets.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -20,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   final pages = [
     const UserCrudView(),
     const Screen2(),
-    const Screen2(),
+    const MainWebView(),
     const Profile(),
   ];
   User? user = FirebaseAuth.instance.currentUser;
@@ -39,11 +42,22 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  String title = "Flutter Basic";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Flutter Project"),
+        title: Text(title),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.pushReplacementNamed(context, "/login");
+            },
+          ),
+        ],
       ),
       body: pages[pageIndex],
       drawer: drawer(context),
@@ -91,9 +105,9 @@ class _HomePageState extends State<HomePage> {
     return Container(
       margin: const EdgeInsets.all(10),
       height: 60,
-      decoration: const BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.all(Radius.circular(50))),
+      decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.8),
+          borderRadius: const BorderRadius.all(Radius.circular(50))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -102,6 +116,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               setState(() {
                 pageIndex = 0;
+                title = "Home";
               });
             },
             icon: pageIndex == 0
@@ -118,6 +133,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               setState(() {
                 pageIndex = 1;
+                title = "Upload Image";
               });
             },
             icon: pageIndex == 1
@@ -134,6 +150,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               setState(() {
                 pageIndex = 2;
+                title = "Web View";
               });
             },
             icon: pageIndex == 2
@@ -150,6 +167,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               setState(() {
                 pageIndex = 3;
+                title = "Profile";
               });
             },
             icon: pageIndex == 3
