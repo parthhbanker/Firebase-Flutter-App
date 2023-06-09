@@ -1,22 +1,18 @@
 import 'dart:ui';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
-class LoginPage extends StatefulWidget {
+class ForgotPassword extends StatefulWidget {
+  const ForgotPassword({Key? key}) : super(key: key);
+
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<ForgotPassword> createState() => _ForgotPasswordState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _ForgotPasswordState extends State<ForgotPassword> {
   final _formKey = GlobalKey<FormState>();
-  var isPasswordHidden = false;
-
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  // firebase
-  final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -119,40 +115,18 @@ class _LoginPageState extends State<LoginPage> {
                                 const InputDecoration(label: Text("Email")),
                           ),
                         ),
-
-                        // Password Input
-                        Container(
-                          margin: const EdgeInsets.only(
-                              top: 20, left: 25, right: 25),
-                          child: TextFormField(
-                            obscureText: isPasswordHidden,
-                            autofocus: true,
-                            controller: passwordController,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              RegExp regex = RegExp(r'^.{6,}$');
-                              if (value!.isEmpty) {
-                                return ("* required");
-                              }
-                              if (!regex.hasMatch(value)) {
-                                return ("Minimum 6 characters!");
-                              }
-                              return null;
-                            },
-                            decoration:
-                                const InputDecoration(label: Text("Password")),
-                          ),
-                        ),
-
-                        // Login Now Button
+                        // Forgot Password Button
                         Container(
                           width: 200,
                           height: 40,
                           margin: const EdgeInsets.only(top: 50),
                           child: OutlinedButton(
                             onPressed: () {
-                              signIn(emailController.text.toString(),
-                                  passwordController.text.toString());
+                              if (_formKey.currentState!.validate()) {
+                                resetPass();
+                                Navigator.pushReplacementNamed(
+                                    context, '/onboarding');
+                              }
                             },
                             style: OutlinedButton.styleFrom(
                                 backgroundColor:
@@ -164,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                                             Color.fromARGB(255, 27, 119, 194),
                                         width: 2.0))),
                             child: const Text(
-                              "Login Now",
+                              "Send Link",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w800,
@@ -173,28 +147,15 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
 
-                        // Forgot Password
+                        // Login
                         Container(
                           margin: const EdgeInsets.all(5),
                           child: TextButton(
-                              onPressed: () {},
-                              child: const Text("Forgot Password?")),
-                        ),
-
-                        Container(
-                          margin: const EdgeInsets.only(top: 250),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text("Dont have an account?"),
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.pushReplacementNamed(
-                                        context, '/signup');
-                                  },
-                                  child: const Text("Sign Up"))
-                            ],
-                          ),
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(
+                                    context, '/login');
+                              },
+                              child: const Text("Login!")),
                         ),
                       ],
                     ),
@@ -208,18 +169,8 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void signIn(String email, String password) async {
-    if (_formKey.currentState!.validate()) {
-      await _auth
-          .signInWithEmailAndPassword(
-              email: email.toString(), password: password.toString())
-          .then((uid) => {
-                Fluttertoast.showToast(msg: "Login Successful!"),
-                Navigator.pushReplacementNamed(context, '/home')
-              })
-          .catchError((e) {
-        Fluttertoast.showToast(msg: e!.message);
-      });
-    }
+  void resetPass() {
+    FirebaseAuth.instance
+        .sendPasswordResetEmail(email: emailController.text.toString());
   }
 }

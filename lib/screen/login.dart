@@ -1,27 +1,24 @@
 import 'dart:ui';
-import 'package:basic/model/user_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class SignupPage extends StatefulWidget {
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
   @override
-  State<SignupPage> createState() => _SignupPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _SignupPageState extends State<SignupPage> {
-  final _auth = FirebaseAuth.instance;
-
+class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  var isPasswordHidden = false;
+  var isPasswordHidden = true;
 
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
-  final conPasswordController = TextEditingController();
-  final emailController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-  String? pass;
+  // firebase
+  final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +77,8 @@ class _SignupPageState extends State<SignupPage> {
             SafeArea(
               child: SingleChildScrollView(
                 child: Form(
-                  key: _formKey,
                   autovalidateMode: AutovalidateMode.always,
+                  key: _formKey,
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -93,7 +90,7 @@ class _SignupPageState extends State<SignupPage> {
                             top: 80,
                           ),
                           child: const Text(
-                            "Create an Account",
+                            "Welcome Back!",
                             style: TextStyle(
                                 fontSize: 28, fontWeight: FontWeight.bold),
                           ),
@@ -103,30 +100,6 @@ class _SignupPageState extends State<SignupPage> {
                         Container(
                           margin: const EdgeInsets.only(
                               top: 50, left: 25, right: 25),
-                          child: TextFormField(
-                            controller: usernameController,
-                            validator: (value) {
-                              RegExp regex = RegExp(r'^.{3,}$');
-
-                              if (value!.isEmpty) {
-                                return '* Required';
-                              }
-                              if (!regex.hasMatch(value)) {
-                                return "Minimum 3 character";
-                              }
-                              return null;
-                            },
-                            autofocus: true,
-                            keyboardType: TextInputType.text,
-                            decoration:
-                                const InputDecoration(label: Text("Username")),
-                          ),
-                        ),
-
-                        // Email Input
-                        Container(
-                          margin: const EdgeInsets.only(
-                              top: 20, left: 25, right: 25),
                           child: TextFormField(
                             autofocus: true,
                             controller: emailController,
@@ -154,55 +127,41 @@ class _SignupPageState extends State<SignupPage> {
                           margin: const EdgeInsets.only(
                               top: 20, left: 25, right: 25),
                           child: TextFormField(
-                            obscureText: isPasswordHidden,
-                            autofocus: true,
-                            controller: passwordController,
-                            keyboardType: TextInputType.visiblePassword,
-                            validator: (value) {
-                              RegExp regex = RegExp(r'^.{6,}$');
-                              pass = value;
-                              if (value!.isEmpty) {
-                                return ("* required");
-                              }
-                              if (!regex.hasMatch(value)) {
-                                return ("Minimum 6 characters!");
-                              }
-                            },
-                            decoration:
-                                const InputDecoration(label: Text("Password")),
-                          ),
+                              obscureText: isPasswordHidden,
+                              autofocus: true,
+                              controller: passwordController,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                RegExp regex = RegExp(r'^.{6,}$');
+                                if (value!.isEmpty) {
+                                  return ("* required");
+                                }
+                                if (!regex.hasMatch(value)) {
+                                  return ("Minimum 6 characters!");
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                  label: const Text("Password"),
+                                  suffixIcon: IconButton(
+                                      onPressed: () {
+                                        isPasswordHidden = !isPasswordHidden;
+                                        setState(() {});
+                                      },
+                                      icon: const Icon(Icons.remove_red_eye),
+                                      ),
+                                      ),
+                                      ),
                         ),
 
-                        // Confirm Password Input
-                        Container(
-                          margin: const EdgeInsets.only(
-                              top: 20, left: 25, right: 25),
-                          child: TextFormField(
-                            obscureText: isPasswordHidden,
-                            autofocus: true,
-                            controller: conPasswordController,
-                            keyboardType: TextInputType.visiblePassword,
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return '* Required';
-                              }
-                              if (value != pass) {
-                                return "Both password are not matching!";
-                              }
-                            },
-                            decoration: const InputDecoration(
-                                label: Text("Confirm Password")),
-                          ),
-                        ),
-
-                        // Sign up Button
+                        // Login Now Button
                         Container(
                           width: 200,
                           height: 40,
                           margin: const EdgeInsets.only(top: 50),
                           child: OutlinedButton(
                             onPressed: () {
-                              signUp(emailController.text.toString(),
+                              signIn(emailController.text.toString(),
                                   passwordController.text.toString());
                             },
                             style: OutlinedButton.styleFrom(
@@ -215,7 +174,7 @@ class _SignupPageState extends State<SignupPage> {
                                             Color.fromARGB(255, 27, 119, 194),
                                         width: 2.0))),
                             child: const Text(
-                              "Sign up",
+                              "Login Now",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w800,
@@ -224,18 +183,28 @@ class _SignupPageState extends State<SignupPage> {
                           ),
                         ),
 
+                        // Forgot Password
                         Container(
-                          margin: const EdgeInsets.only(top: 160),
+                          margin: const EdgeInsets.all(5),
+                          child: TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/forgot');
+                              },
+                              child: const Text("Forgot Password?")),
+                        ),
+
+                        Container(
+                          margin: const EdgeInsets.only(top: 250),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text("Already have an account?"),
+                              const Text("Dont have an account?"),
                               TextButton(
                                   onPressed: () {
                                     Navigator.pushReplacementNamed(
-                                        context, '/login');
+                                        context, '/signup');
                                   },
-                                  child: const Text("Login"))
+                                  child: const Text("Sign Up"))
                             ],
                           ),
                         ),
@@ -251,38 +220,18 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  void signUp(String email, String password) async {
+  void signIn(String email, String password) async {
     if (_formKey.currentState!.validate()) {
       await _auth
-          .createUserWithEmailAndPassword(email: email, password: password)
-          .then((value) => {postDetailsToFirestore()})
+          .signInWithEmailAndPassword(
+              email: email.toString(), password: password.toString())
+          .then((uid) => {
+                Fluttertoast.showToast(msg: "Login Successful!"),
+                Navigator.pushReplacementNamed(context, '/home')
+              })
           .catchError((e) {
         Fluttertoast.showToast(msg: e!.message);
       });
     }
-  }
-
-  postDetailsToFirestore() async {
-    // Calling our firestore
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    User? user = _auth.currentUser;
-
-    // Calling usermodel
-    UserModel userModel = UserModel();
-
-    // writing all the values
-    userModel.email = user!.email;
-    userModel.uid = user.uid;
-    userModel.username = usernameController.text;
-
-    // sending our values
-    await firebaseFirestore
-        .collection("users")
-        .doc(user.uid)
-        .set(userModel.toMap());
-
-    Fluttertoast.showToast(msg: "Account Created Successfully ;)");
-
-    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }
 }
