@@ -210,9 +210,6 @@ class _LoginPageState extends State<LoginPage> {
 
   void signIn(String email, String password) async {
     if (_formKey.currentState!.validate()) {
-      print("hello");
-      print(email);
-      print(password);
       await _auth
           .signInWithEmailAndPassword(
               email: email.toString(), password: password.toString())
